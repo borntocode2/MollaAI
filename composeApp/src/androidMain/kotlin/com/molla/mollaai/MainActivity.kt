@@ -13,7 +13,9 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
 
         setContent {
-            App()
+            App(onConnectOpenAI = {
+                OpenAIConnectionLauncher.openApiKeyPage(this)
+            })
         }
     }
 }

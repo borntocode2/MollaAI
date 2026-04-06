@@ -1,5 +1,19 @@
 This is a Kotlin Multiplatform project targeting Android, iOS, Web, Desktop (JVM), Server.
 
+## 개발 기록
+
+### 2026-04-06
+
+- Android 시작 화면을 `molla AI` 온보딩 카드 구조로 정리했습니다.
+- `ChatGPT 연결하기` 버튼을 추가하고, Android에서 OpenAI 공식 API 키 발급 페이지(`https://platform.openai.com/api-keys`)를 브라우저로 여는 연결 로직을 넣었습니다.
+- 구현 위치:
+  - 공통 UI: [`composeApp/src/commonMain/kotlin/com/molla/mollaai/App.kt`](/Users/ralph/BackEnd/MollaAI/composeApp/src/commonMain/kotlin/com/molla/mollaai/App.kt)
+  - Android 진입점: [`composeApp/src/androidMain/kotlin/com/molla/mollaai/MainActivity.kt`](/Users/ralph/BackEnd/MollaAI/composeApp/src/androidMain/kotlin/com/molla/mollaai/MainActivity.kt)
+  - Android 외부 링크 실행: [`composeApp/src/androidMain/kotlin/com/molla/mollaai/OpenAIConnectionLauncher.kt`](/Users/ralph/BackEnd/MollaAI/composeApp/src/androidMain/kotlin/com/molla/mollaai/OpenAIConnectionLauncher.kt)
+- Android 컴파일 확인:
+  - `./gradlew :composeApp:compileDebugKotlinAndroid`
+  - 결과: 성공
+
 * [/composeApp](./composeApp/src) is for code that will be shared across your Compose Multiplatform applications.
   It contains several subfolders:
     - [commonMain](./composeApp/src/commonMain/kotlin) is for code that’s common for all targets.
