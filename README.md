@@ -6,10 +6,17 @@ This is a Kotlin Multiplatform project targeting Android, iOS, Web, Desktop (JVM
 
 - Android 시작 화면을 `molla AI` 온보딩 카드 구조로 정리했습니다.
 - `ChatGPT 연결하기` 버튼을 추가하고, Android에서 OpenAI 공식 API 키 발급 페이지(`https://platform.openai.com/api-keys`)를 브라우저로 여는 연결 로직을 넣었습니다.
+- Google Credential Manager 기반 로그인 흐름을 Android에 추가했습니다.
+- 로그인 성공 시 앱 안에서 Google 계정 이메일과 이름을 표시하도록 연결했습니다.
 - 구현 위치:
   - 공통 UI: [`composeApp/src/commonMain/kotlin/com/molla/mollaai/App.kt`](/Users/ralph/BackEnd/MollaAI/composeApp/src/commonMain/kotlin/com/molla/mollaai/App.kt)
   - Android 진입점: [`composeApp/src/androidMain/kotlin/com/molla/mollaai/MainActivity.kt`](/Users/ralph/BackEnd/MollaAI/composeApp/src/androidMain/kotlin/com/molla/mollaai/MainActivity.kt)
+  - Android Google 로그인 코디네이터: [`composeApp/src/androidMain/kotlin/com/molla/mollaai/GoogleSignInCoordinator.kt`](/Users/ralph/BackEnd/MollaAI/composeApp/src/androidMain/kotlin/com/molla/mollaai/GoogleSignInCoordinator.kt)
   - Android 외부 링크 실행: [`composeApp/src/androidMain/kotlin/com/molla/mollaai/OpenAIConnectionLauncher.kt`](/Users/ralph/BackEnd/MollaAI/composeApp/src/androidMain/kotlin/com/molla/mollaai/OpenAIConnectionLauncher.kt)
+- Android 설정 변경:
+  - `composeApp/src/androidMain/AndroidManifest.xml`에 `INTERNET` 권한 추가
+  - `composeApp/build.gradle.kts`에 Credential Manager / Google ID 의존성 추가
+  - `gradle/libs.versions.toml`에 관련 버전 추가
 - Android 컴파일 확인:
   - `./gradlew :composeApp:compileDebugKotlinAndroid`
   - 결과: 성공

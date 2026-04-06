@@ -42,6 +42,9 @@ kotlin {
 
     sourceSets {
         androidMain.dependencies {
+            implementation(libs.androidx.credentials)
+            implementation(libs.androidx.credentials.play.services.auth)
+            implementation(libs.googleid)
             implementation(libs.compose.uiToolingPreview)
             implementation(libs.androidx.activity.compose)
         }

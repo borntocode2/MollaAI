@@ -14,6 +14,7 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -25,6 +26,10 @@ import androidx.compose.ui.unit.dp
 @Composable
 @Preview
 fun App(
+    googleAccountLabel: String? = null,
+    isGoogleSignInInProgress: Boolean = false,
+    googleSignInErrorMessage: String? = null,
+    onGoogleSignIn: () -> Unit = {},
     onConnectOpenAI: () -> Unit = {},
 ) {
     MaterialTheme {
@@ -58,15 +63,44 @@ fun App(
                         textAlign = TextAlign.Center,
                     )
                     Text(
-                        text = "OpenAI 공식 API 키 발급 페이지로 이동해서 ChatGPT 연동을 시작합니다.",
+                        text = "먼저 Google로 로그인하고, 그 다음 OpenAI API 키 발급 페이지로 이동합니다.",
                         style = MaterialTheme.typography.bodyMedium,
                         textAlign = TextAlign.Center,
                     )
+                    if (googleAccountLabel != null) {
+                        Text(
+                            text = "로그인됨: $googleAccountLabel",
+                            style = MaterialTheme.typography.bodySmall,
+                            textAlign = TextAlign.Center,
+                        )
+                    }
+                    if (googleSignInErrorMessage != null) {
+                        Text(
+                            text = googleSignInErrorMessage,
+                            style = MaterialTheme.typography.bodySmall,
+                            textAlign = TextAlign.Center,
+                        )
+                    }
+                    Button(
+                        onClick = onGoogleSignIn,
+                        modifier = Modifier.fillMaxWidth(),
+                        enabled = !isGoogleSignInInProgress,
+                    ) {
+                        Text(
+                            text = if (isGoogleSignInInProgress) "Google 로그인 중..." else "Google 로그인",
+                        )
+                    }
                     Button(
                         onClick = onConnectOpenAI,
                         modifier = Modifier.fillMaxWidth(),
                     ) {
                         Text("ChatGPT 연결하기")
+                    }
+                    OutlinedButton(
+                        onClick = {},
+                        modifier = Modifier.fillMaxWidth(),
+                    ) {
+                        Text("나중에 할게요")
                     }
                 }
             }
