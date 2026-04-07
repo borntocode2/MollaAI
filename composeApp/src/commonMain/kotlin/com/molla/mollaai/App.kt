@@ -92,15 +92,6 @@ fun App(
                             textAlign = TextAlign.Center,
                         )
                     }
-                    Button(
-                        onClick = onGoogleSignIn,
-                        modifier = Modifier.fillMaxWidth(),
-                        enabled = !isGoogleSignInInProgress,
-                    ) {
-                        Text(
-                            text = if (isGoogleSignInInProgress) "Google 로그인 중..." else "Google 로그인",
-                        )
-                    }
                     if (isLoggedIn) {
                         Button(
                             onClick = onConnectOpenAI,
@@ -108,6 +99,16 @@ fun App(
                             enabled = !isBackendSyncInProgress,
                         ) {
                             Text(if (isBackendSyncInProgress) "서버 동기화 중..." else "ChatGPT 연결하기")
+                        }
+                    } else {
+                        Button(
+                            onClick = onGoogleSignIn,
+                            modifier = Modifier.fillMaxWidth(),
+                            enabled = !isGoogleSignInInProgress,
+                        ) {
+                            Text(
+                                text = if (isGoogleSignInInProgress) "Google 로그인 중..." else "Google 로그인",
+                            )
                         }
                     }
                     OutlinedButton(
