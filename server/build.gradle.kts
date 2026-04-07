@@ -6,6 +6,11 @@ plugins {
 
 group = "com.molla.mollaai"
 version = "1.0.0"
+
+kotlin {
+    jvmToolchain(17)
+}
+
 application {
     mainClass.set("com.molla.mollaai.ApplicationKt")
 

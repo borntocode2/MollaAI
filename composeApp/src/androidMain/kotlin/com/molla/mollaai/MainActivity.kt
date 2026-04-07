@@ -1,6 +1,7 @@
 package com.molla.mollaai
 
 import android.os.Bundle
+import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
@@ -64,6 +65,7 @@ class MainActivity : ComponentActivity() {
     private fun startGoogleSignIn() {
         if (isGoogleSignInInProgress) return
 
+        Log.i(TAG, "Google sign-in button pressed")
         googleSignInErrorMessage = null
         isGoogleSignInInProgress = true
 
@@ -71,6 +73,7 @@ class MainActivity : ComponentActivity() {
             runCatching {
                 googleSignInCoordinator.signIn(this@MainActivity)
             }.onSuccess { session ->
+                Log.i(TAG, "Google sign-in succeeded: email=${session.email}")
                 googleAccountLabel = buildString {
                     append(session.displayName ?: "이름 없음")
                     append(" / ")
@@ -82,23 +85,30 @@ class MainActivity : ComponentActivity() {
                 runCatching {
                     backendAuthClient.exchangeGoogleIdToken(session.idToken)
                 }.onSuccess { backendSession ->
+                    Log.i(TAG, "Backend session received and user sync succeeded")
                     backendSessionToken = backendSession.accessToken
                     authSessionStore.save(backendSession)
                     backendSyncMessage = "서버 로그인 완료: 앱 세션 토큰을 받았습니다."
                     googleSignInErrorMessage = null
                 }.onFailure { backendError ->
+                    Log.e(TAG, "Backend sync failed", backendError)
                     backendSessionToken = null
                     authSessionStore.clear()
                     backendSyncMessage = null
                     googleSignInErrorMessage = backendError.message ?: "서버 인증에 실패했습니다."
                 }
             }.onFailure { error ->
+                Log.e(TAG, "Google sign-in failed", error)
                 googleSignInErrorMessage = error.message ?: "Google 로그인에 실패했습니다."
             }
 
             isBackendSyncInProgress = false
             isGoogleSignInInProgress = false
         }
+    }
+
+    private companion object {
+        private const val TAG = "MainActivity"
     }
 }
 

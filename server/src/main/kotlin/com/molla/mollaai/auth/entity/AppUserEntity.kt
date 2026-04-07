@@ -1,5 +1,6 @@
-package com.molla.mollaai.auth
+package com.molla.mollaai.auth.entity
 
+import com.molla.mollaai.auth.model.AppUserRecord
 import jakarta.persistence.Column
 import jakarta.persistence.Entity
 import jakarta.persistence.Id

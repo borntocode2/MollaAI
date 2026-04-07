@@ -1,5 +1,6 @@
-package com.molla.mollaai.auth
+package com.molla.mollaai.auth.repository
 
+import com.molla.mollaai.auth.model.AppUserRecord
 import java.time.Instant
 
 interface UserRepository {

@@ -1,5 +1,6 @@
-package com.molla.mollaai.auth
+package com.molla.mollaai.auth.persistence
 
+import com.molla.mollaai.auth.config.AppDatabaseConfig
 import jakarta.persistence.EntityManager
 import jakarta.persistence.EntityManagerFactory
 import jakarta.persistence.Persistence

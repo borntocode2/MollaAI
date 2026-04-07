@@ -1,8 +1,8 @@
 package com.molla.mollaai
 
-import com.molla.mollaai.auth.AppAuthConfig
-import com.molla.mollaai.auth.AppUserRecord
-import com.molla.mollaai.auth.UserRepository
+import com.molla.mollaai.auth.config.AppAuthConfig
+import com.molla.mollaai.auth.model.AppUserRecord
+import com.molla.mollaai.auth.repository.UserRepository
 import io.ktor.client.request.*
 import io.ktor.client.statement.*
 import io.ktor.http.*

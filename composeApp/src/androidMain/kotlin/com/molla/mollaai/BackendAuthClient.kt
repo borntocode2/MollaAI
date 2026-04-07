@@ -1,6 +1,7 @@
 package com.molla.mollaai
 
 import android.content.Context
+import android.util.Log
 import io.ktor.client.HttpClient
 import io.ktor.client.engine.okhttp.OkHttp
 import io.ktor.client.request.header
@@ -26,14 +27,18 @@ class BackendAuthClient(
     suspend fun exchangeGoogleIdToken(idToken: String): BackendSession {
         val baseUrl = context.getString(R.string.backend_base_url).trimEnd('/')
         require(baseUrl.isNotBlank()) { "백엔드 주소가 설정되지 않았습니다." }
+        Log.i(TAG, "Sending Google ID token to backend: url=$baseUrl/auth/google")
 
-        val responseText = httpClient.post("$baseUrl/auth/google") {
+        val response = httpClient.post("$baseUrl/auth/google") {
             contentType(ContentType.Application.Json)
             header("Accept", ContentType.Application.Json.toString())
             setBody(buildJsonObject {
                 put("idToken", idToken)
             }.toString())
-        }.bodyAsText()
+        }
+        val responseText = response.bodyAsText()
+        Log.i(TAG, "Backend response received: status=${response.status}")
+        Log.d(TAG, "Backend response body: $responseText")
 
         val jsonElement = Json.parseToJsonElement(responseText).jsonObject
         val accessToken = jsonElement["accessToken"]?.jsonPrimitive?.content
@@ -52,7 +57,12 @@ class BackendAuthClient(
     }
 
     fun close() {
+        Log.i(TAG, "Closing backend auth client")
         httpClient.close()
+    }
+
+    private companion object {
+        private const val TAG = "BackendAuthClient"
     }
 }
 

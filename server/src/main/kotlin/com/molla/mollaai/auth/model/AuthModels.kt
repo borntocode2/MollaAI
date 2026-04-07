@@ -1,4 +1,4 @@
-package com.molla.mollaai.auth
+package com.molla.mollaai.auth.model
 
 import kotlinx.serialization.json.JsonObject
 import kotlinx.serialization.json.buildJsonObject

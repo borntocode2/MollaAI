@@ -1,13 +1,13 @@
 package com.molla.mollaai
 
-import com.molla.mollaai.auth.AppAuthConfig
-import com.molla.mollaai.auth.JpaUserRepository
-import com.molla.mollaai.auth.createUserEntityManagerFactory
-import com.molla.mollaai.auth.GoogleIdTokenAuthService
-import com.molla.mollaai.auth.loadAppDatabaseConfig
-import com.molla.mollaai.auth.UserRepository
-import com.molla.mollaai.auth.loadAppAuthConfig
-import com.molla.mollaai.auth.toJsonObject
+import com.molla.mollaai.auth.config.AppAuthConfig
+import com.molla.mollaai.auth.config.loadAppAuthConfig
+import com.molla.mollaai.auth.config.loadAppDatabaseConfig
+import com.molla.mollaai.auth.model.toJsonObject
+import com.molla.mollaai.auth.persistence.JpaUserRepository
+import com.molla.mollaai.auth.persistence.createUserEntityManagerFactory
+import com.molla.mollaai.auth.repository.UserRepository
+import com.molla.mollaai.auth.service.GoogleIdTokenAuthService
 import io.ktor.http.ContentType
 import io.ktor.http.HttpStatusCode
 import io.ktor.server.application.Application
@@ -23,8 +23,10 @@ import io.ktor.server.routing.routing
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.jsonObject
 import kotlinx.serialization.json.jsonPrimitive
+import org.slf4j.LoggerFactory
 
 private const val JSON_MEDIA_TYPE = "application/json; charset=utf-8"
+private val logger = LoggerFactory.getLogger("Application")
 
 fun main() {
     val yamlConfig = YamlConfig("application.yaml")
@@ -70,6 +72,7 @@ fun Application.module(
 
         post("/auth/google") {
             try {
+                logger.info("Received /auth/google request")
                 val requestJson = Json.parseToJsonElement(call.receiveText()).jsonObject
                 val idToken = requestJson["idToken"]?.jsonPrimitive?.content
                     ?: return@post call.respondText(
@@ -78,13 +81,16 @@ fun Application.module(
                         status = HttpStatusCode.BadRequest,
                     )
 
+                logger.info("Delegating Google auth to service")
                 val session = authService.authenticate(idToken)
+                logger.info("Authentication succeeded for subject={}", session.user.googleSubject)
                 call.respondText(
                     text = session.toJsonObject().toString(),
                     contentType = ContentType.parse(JSON_MEDIA_TYPE),
                     status = HttpStatusCode.OK,
                 )
             } catch (exception: IllegalArgumentException) {
+                logger.warn("Authentication failed: {}", exception.message)
                 call.respondText(
                     text = """{"message":"${exception.message ?: "인증 실패"}"}""",
                     contentType = ContentType.parse(JSON_MEDIA_TYPE),

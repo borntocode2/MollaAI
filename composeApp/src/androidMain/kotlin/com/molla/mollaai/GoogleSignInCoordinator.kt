@@ -3,6 +3,7 @@ package com.molla.mollaai
 import android.app.Activity
 import android.content.Context
 import android.util.Base64
+import android.util.Log
 import androidx.credentials.CredentialManager
 import androidx.credentials.CustomCredential
 import androidx.credentials.GetCredentialRequest
@@ -25,6 +26,7 @@ class GoogleSignInCoordinator(
         require(webClientId.isNotBlank() && webClientId != "YOUR_WEB_CLIENT_ID") {
             "Google 웹 클라이언트 ID가 아직 설정되지 않았습니다."
         }
+        Log.i(TAG, "Starting Google sign-in flow")
 
         val googleOption = GetSignInWithGoogleOption.Builder(webClientId)
             .setNonce(createNonce())
@@ -60,6 +62,10 @@ class GoogleSignInCoordinator(
         val bytes = ByteArray(16)
         SecureRandom().nextBytes(bytes)
         return Base64.encodeToString(bytes, Base64.NO_WRAP or Base64.URL_SAFE)
+    }
+
+    private companion object {
+        private const val TAG = "GoogleSignIn"
     }
 }
 

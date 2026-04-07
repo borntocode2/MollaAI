@@ -1,4 +1,4 @@
-package com.molla.mollaai.auth
+package com.molla.mollaai.auth.config
 
 import io.ktor.server.config.ApplicationConfig
 
