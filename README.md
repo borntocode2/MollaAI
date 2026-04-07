@@ -8,17 +8,40 @@ This is a Kotlin Multiplatform project targeting Android, iOS, Web, Desktop (JVM
 - `ChatGPT 연결하기` 버튼을 추가하고, Android에서 OpenAI 공식 API 키 발급 페이지(`https://platform.openai.com/api-keys`)를 브라우저로 여는 연결 로직을 넣었습니다.
 - Google Credential Manager 기반 로그인 흐름을 Android에 추가했습니다.
 - 로그인 성공 시 앱 안에서 Google 계정 이메일과 이름을 표시하도록 연결했습니다.
+- Google 로그인 직후 `idToken`을 Ktor 서버의 `/auth/google`로 전송하고, 서버에서 Google 서명 검증 후 앱 세션 JWT를 발급하는 흐름을 추가했습니다.
+- 서버는 인메모리 사용자 저장소를 사용해 Google 사용자 레코드를 유지합니다.
+- Android는 서버가 발급한 JWT를 `EncryptedSharedPreferences` 기반 안전 저장소에 보관하고, 앱 재실행 시 복원합니다.
+- 서버 설정을 `server/src/main/resources/application.yaml` 기반으로 바꾸고, `AppConfig`는 그 YAML을 읽어 typed config로 변환하도록 변경했습니다.
 - 구현 위치:
   - 공통 UI: [`composeApp/src/commonMain/kotlin/com/molla/mollaai/App.kt`](/Users/ralph/BackEnd/MollaAI/composeApp/src/commonMain/kotlin/com/molla/mollaai/App.kt)
   - Android 진입점: [`composeApp/src/androidMain/kotlin/com/molla/mollaai/MainActivity.kt`](/Users/ralph/BackEnd/MollaAI/composeApp/src/androidMain/kotlin/com/molla/mollaai/MainActivity.kt)
   - Android Google 로그인 코디네이터: [`composeApp/src/androidMain/kotlin/com/molla/mollaai/GoogleSignInCoordinator.kt`](/Users/ralph/BackEnd/MollaAI/composeApp/src/androidMain/kotlin/com/molla/mollaai/GoogleSignInCoordinator.kt)
+  - Android 서버 인증 클라이언트: [`composeApp/src/androidMain/kotlin/com/molla/mollaai/BackendAuthClient.kt`](/Users/ralph/BackEnd/MollaAI/composeApp/src/androidMain/kotlin/com/molla/mollaai/BackendAuthClient.kt)
+  - Android 세션 저장소: [`composeApp/src/androidMain/kotlin/com/molla/mollaai/AuthSessionStore.kt`](/Users/ralph/BackEnd/MollaAI/composeApp/src/androidMain/kotlin/com/molla/mollaai/AuthSessionStore.kt)
   - Android 외부 링크 실행: [`composeApp/src/androidMain/kotlin/com/molla/mollaai/OpenAIConnectionLauncher.kt`](/Users/ralph/BackEnd/MollaAI/composeApp/src/androidMain/kotlin/com/molla/mollaai/OpenAIConnectionLauncher.kt)
+  - 서버 인증 서비스: [`server/src/main/kotlin/com/molla/mollaai/auth/GoogleIdTokenAuthService.kt`](/Users/ralph/BackEnd/MollaAI/server/src/main/kotlin/com/molla/mollaai/auth/GoogleIdTokenAuthService.kt)
+  - 서버 사용자 저장소: [`server/src/main/kotlin/com/molla/mollaai/auth/UserRepository.kt`](/Users/ralph/BackEnd/MollaAI/server/src/main/kotlin/com/molla/mollaai/auth/UserRepository.kt)
+  - 서버 인증 라우트: [`server/src/main/kotlin/com/molla/mollaai/Application.kt`](/Users/ralph/BackEnd/MollaAI/server/src/main/kotlin/com/molla/mollaai/Application.kt)
+  - 서버 설정 파일: [`server/src/main/resources/application.yaml`](/Users/ralph/BackEnd/MollaAI/server/src/main/resources/application.yaml)
 - Android 설정 변경:
   - `composeApp/src/androidMain/AndroidManifest.xml`에 `INTERNET` 권한 추가
   - `composeApp/build.gradle.kts`에 Credential Manager / Google ID 의존성 추가
+  - `composeApp/build.gradle.kts`에 Ktor Client 의존성 추가
+  - `composeApp/build.gradle.kts`에 Android Security Crypto 의존성 추가
   - `gradle/libs.versions.toml`에 관련 버전 추가
+  - `composeApp/src/androidMain/res/values/strings.xml`에 Google Web Client ID와 서버 주소 추가
+- 서버 실행 전 환경변수:
+  - `GOOGLE_WEB_CLIENT_ID`
+  - `APP_JWT_SECRET`
+  - 선택: `APP_JWT_ISSUER`, `APP_JWT_AUDIENCE`
+- 서버 설정 파일 예시:
+  - `app.googleWebClientId: $GOOGLE_WEB_CLIENT_ID`
+  - `app.jwtSecret: $APP_JWT_SECRET`
 - Android 컴파일 확인:
   - `./gradlew :composeApp:compileDebugKotlinAndroid`
+  - 결과: 성공
+- 서버 컴파일 확인:
+  - `./gradlew :server:compileKotlin`
   - 결과: 성공
 
 * [/composeApp](./composeApp/src) is for code that will be shared across your Compose Multiplatform applications.

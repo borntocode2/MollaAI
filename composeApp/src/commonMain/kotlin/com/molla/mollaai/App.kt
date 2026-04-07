@@ -29,6 +29,8 @@ fun App(
     googleAccountLabel: String? = null,
     isGoogleSignInInProgress: Boolean = false,
     googleSignInErrorMessage: String? = null,
+    backendSyncMessage: String? = null,
+    isBackendSyncInProgress: Boolean = false,
     onGoogleSignIn: () -> Unit = {},
     onConnectOpenAI: () -> Unit = {},
 ) {
@@ -81,6 +83,13 @@ fun App(
                             textAlign = TextAlign.Center,
                         )
                     }
+                    if (backendSyncMessage != null) {
+                        Text(
+                            text = backendSyncMessage,
+                            style = MaterialTheme.typography.bodySmall,
+                            textAlign = TextAlign.Center,
+                        )
+                    }
                     Button(
                         onClick = onGoogleSignIn,
                         modifier = Modifier.fillMaxWidth(),
@@ -93,8 +102,9 @@ fun App(
                     Button(
                         onClick = onConnectOpenAI,
                         modifier = Modifier.fillMaxWidth(),
+                        enabled = !isBackendSyncInProgress,
                     ) {
-                        Text("ChatGPT 연결하기")
+                        Text(if (isBackendSyncInProgress) "서버 동기화 중..." else "ChatGPT 연결하기")
                     }
                     OutlinedButton(
                         onClick = {},
