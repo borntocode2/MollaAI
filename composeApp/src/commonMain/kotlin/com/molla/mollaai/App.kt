@@ -34,6 +34,8 @@ fun App(
     onGoogleSignIn: () -> Unit = {},
     onConnectOpenAI: () -> Unit = {},
 ) {
+    val isLoggedIn = googleAccountLabel != null
+
     MaterialTheme {
         Column(
             modifier = Modifier
@@ -99,12 +101,14 @@ fun App(
                             text = if (isGoogleSignInInProgress) "Google 로그인 중..." else "Google 로그인",
                         )
                     }
-                    Button(
-                        onClick = onConnectOpenAI,
-                        modifier = Modifier.fillMaxWidth(),
-                        enabled = !isBackendSyncInProgress,
-                    ) {
-                        Text(if (isBackendSyncInProgress) "서버 동기화 중..." else "ChatGPT 연결하기")
+                    if (isLoggedIn) {
+                        Button(
+                            onClick = onConnectOpenAI,
+                            modifier = Modifier.fillMaxWidth(),
+                            enabled = !isBackendSyncInProgress,
+                        ) {
+                            Text(if (isBackendSyncInProgress) "서버 동기화 중..." else "ChatGPT 연결하기")
+                        }
                     }
                     OutlinedButton(
                         onClick = {},
