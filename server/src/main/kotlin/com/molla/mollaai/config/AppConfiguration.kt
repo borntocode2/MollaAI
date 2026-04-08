@@ -13,7 +13,7 @@ import org.springframework.context.annotation.Configuration
 import org.springframework.boot.context.properties.EnableConfigurationProperties
 
 @Configuration
-@EnableConfigurationProperties(AppProperties::class)
+@EnableConfigurationProperties(AppProperties::class, OpenAiProperties::class)
 class AppConfiguration {
     @Bean
     fun appAuthConfig(appProperties: AppProperties): AppAuthConfig = AppAuthConfig(

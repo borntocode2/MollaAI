@@ -42,9 +42,6 @@ class MainActivity : ComponentActivity() {
                 backendSyncMessage = backendSyncMessage,
                 isBackendSyncInProgress = isBackendSyncInProgress,
                 onGoogleSignIn = ::startGoogleSignIn,
-                onConnectOpenAI = {
-                    OpenAIConnectionLauncher.openApiKeyPage(this)
-                },
             )
         }
     }

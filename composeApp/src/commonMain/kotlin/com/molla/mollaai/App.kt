@@ -32,7 +32,6 @@ fun App(
     backendSyncMessage: String? = null,
     isBackendSyncInProgress: Boolean = false,
     onGoogleSignIn: () -> Unit = {},
-    onConnectOpenAI: () -> Unit = {},
 ) {
     val isLoggedIn = googleAccountLabel != null
 
@@ -67,7 +66,7 @@ fun App(
                         textAlign = TextAlign.Center,
                     )
                     Text(
-                        text = "먼저 Google로 로그인하고, 그 다음 OpenAI API 키 발급 페이지로 이동합니다.",
+                        text = "먼저 Google로 로그인하세요.",
                         style = MaterialTheme.typography.bodyMedium,
                         textAlign = TextAlign.Center,
                     )
@@ -92,15 +91,7 @@ fun App(
                             textAlign = TextAlign.Center,
                         )
                     }
-                    if (isLoggedIn) {
-                        Button(
-                            onClick = onConnectOpenAI,
-                            modifier = Modifier.fillMaxWidth(),
-                            enabled = !isBackendSyncInProgress,
-                        ) {
-                            Text(if (isBackendSyncInProgress) "서버 동기화 중..." else "ChatGPT 연결하기")
-                        }
-                    } else {
+                    if (!isLoggedIn) {
                         Button(
                             onClick = onGoogleSignIn,
                             modifier = Modifier.fillMaxWidth(),

@@ -4,7 +4,6 @@ import com.molla.mollaai.auth.model.AuthSessionResponse
 import com.molla.mollaai.auth.service.AuthService
 import com.molla.mollaai.controller.ApiExceptionHandler
 import com.molla.mollaai.controller.AuthController
-import com.molla.mollaai.controller.LlmController
 import com.molla.mollaai.controller.RootController
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -30,7 +29,6 @@ class ApplicationTest {
         mockMvc = MockMvcBuilders
             .standaloneSetup(
                 RootController(),
-                LlmController(),
                 AuthController(TestAuthService()),
             )
             .setControllerAdvice(ApiExceptionHandler())
@@ -42,21 +40,6 @@ class ApplicationTest {
         mockMvc.perform(get("/"))
             .andExpect(status().isOk)
             .andExpect(content().string("Spring server is running"))
-    }
-
-    @Test
-    fun testPromptEndpoint() {
-        mockMvc.perform(
-            post("/api/llm/prompt")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content("""{"prompt":"Say hello"}"""),
-        )
-            .andExpect(status().isOk)
-            .andExpect(
-                content().json(
-                    """{"prompt":"Say hello","response":"LLM endpoint is wired, but no model backend is connected yet."}""",
-                ),
-            )
     }
 
     @Test

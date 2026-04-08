@@ -5,7 +5,6 @@ This is a Kotlin Multiplatform project targeting Android, iOS, Web, Desktop (JVM
 ### 2026-04-06
 
 - Android 시작 화면을 `molla AI` 온보딩 카드 구조로 정리했습니다.
-- `ChatGPT 연결하기` 버튼을 추가하고, Android에서 OpenAI 공식 API 키 발급 페이지(`https://platform.openai.com/api-keys`)를 브라우저로 여는 연결 로직을 넣었습니다.
 - Google Credential Manager 기반 로그인 흐름을 Android에 추가했습니다.
 - 로그인 성공 시 앱 안에서 Google 계정 이메일과 이름을 표시하도록 연결했습니다.
 - Google 로그인 직후 `idToken`을 Ktor 서버의 `/auth/google`로 전송하고, 서버에서 Google 서명 검증 후 앱 세션 JWT를 발급하는 흐름을 추가했습니다.
@@ -18,7 +17,6 @@ This is a Kotlin Multiplatform project targeting Android, iOS, Web, Desktop (JVM
   - Android Google 로그인 코디네이터: [`composeApp/src/androidMain/kotlin/com/molla/mollaai/GoogleSignInCoordinator.kt`](/Users/ralph/BackEnd/MollaAI/composeApp/src/androidMain/kotlin/com/molla/mollaai/GoogleSignInCoordinator.kt)
   - Android 서버 인증 클라이언트: [`composeApp/src/androidMain/kotlin/com/molla/mollaai/BackendAuthClient.kt`](/Users/ralph/BackEnd/MollaAI/composeApp/src/androidMain/kotlin/com/molla/mollaai/BackendAuthClient.kt)
   - Android 세션 저장소: [`composeApp/src/androidMain/kotlin/com/molla/mollaai/AuthSessionStore.kt`](/Users/ralph/BackEnd/MollaAI/composeApp/src/androidMain/kotlin/com/molla/mollaai/AuthSessionStore.kt)
-  - Android 외부 링크 실행: [`composeApp/src/androidMain/kotlin/com/molla/mollaai/OpenAIConnectionLauncher.kt`](/Users/ralph/BackEnd/MollaAI/composeApp/src/androidMain/kotlin/com/molla/mollaai/OpenAIConnectionLauncher.kt)
   - 서버 인증 서비스: [`server/src/main/kotlin/com/molla/mollaai/auth/GoogleIdTokenAuthService.kt`](/Users/ralph/BackEnd/MollaAI/server/src/main/kotlin/com/molla/mollaai/auth/GoogleIdTokenAuthService.kt)
   - 서버 사용자 저장소: [`server/src/main/kotlin/com/molla/mollaai/auth/UserRepository.kt`](/Users/ralph/BackEnd/MollaAI/server/src/main/kotlin/com/molla/mollaai/auth/UserRepository.kt)
   - 서버 인증 라우트: [`server/src/main/kotlin/com/molla/mollaai/Application.kt`](/Users/ralph/BackEnd/MollaAI/server/src/main/kotlin/com/molla/mollaai/Application.kt)
