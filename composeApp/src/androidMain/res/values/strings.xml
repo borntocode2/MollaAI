@@ -1,5 +1,5 @@
 <resources>
     <string name="app_name">mollaai</string>
     <string name="google_web_client_id">218472379154-5je992jvpaltni15lcnk4avoqpddvmt9.apps.googleusercontent.com</string>
-    <string name="backend_base_url">http://10.0.2.2:8080</string>
+    <string name="spring_server_base_url">http://10.0.2.2:8080</string>
 </resources>

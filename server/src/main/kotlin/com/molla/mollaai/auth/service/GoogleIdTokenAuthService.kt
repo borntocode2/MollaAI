@@ -17,7 +17,7 @@ class GoogleIdTokenAuthService(
     private val config: AppAuthConfig,
     private val userRepository: UserRepository,
     private val clock: Clock = Clock.systemUTC(),
-) {
+) : AuthService {
     private val logger = LoggerFactory.getLogger(GoogleIdTokenAuthService::class.java)
     private val verifier: GoogleIdTokenVerifier = GoogleIdTokenVerifier.Builder(
         GoogleNetHttpTransport.newTrustedTransport(),
@@ -28,7 +28,7 @@ class GoogleIdTokenAuthService(
 
     private val jwtAlgorithm = Algorithm.HMAC256(config.jwtSecret)
 
-    fun authenticate(idTokenString: String): AuthSessionResponse {
+    override fun authenticate(idTokenString: String): AuthSessionResponse {
         logger.info("Verifying Google ID token")
         val idToken = verifier.verify(idTokenString)
             ?: throw IllegalArgumentException("Google ID 토큰 검증에 실패했습니다.")

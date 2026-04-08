@@ -17,7 +17,7 @@ import kotlinx.serialization.json.jsonPrimitive
 import kotlinx.serialization.json.put
 
 /**
- * Google ID Token을 우리 서버로 보내고, 앱 세션 토큰을 받아오는 클라이언트입니다.
+ * Google ID Token을 Spring 서버로 보내고, 앱 세션 토큰을 받아오는 클라이언트입니다.
  */
 class BackendAuthClient(
     private val context: Context,
@@ -25,11 +25,11 @@ class BackendAuthClient(
     private val httpClient = HttpClient(OkHttp)
 
     suspend fun exchangeGoogleIdToken(idToken: String): BackendSession {
-        val baseUrl = context.getString(R.string.backend_base_url).trimEnd('/')
+        val baseUrl = context.getString(R.string.spring_server_base_url).trimEnd('/')
         require(baseUrl.isNotBlank()) { "백엔드 주소가 설정되지 않았습니다." }
-        Log.i(TAG, "Sending Google ID token to backend: url=$baseUrl/auth/google")
+        Log.i(TAG, "Sending Google ID token to Spring server: url=$baseUrl${ServerRoutes.AUTH_GOOGLE}")
 
-        val response = httpClient.post("$baseUrl/auth/google") {
+        val response = httpClient.post("$baseUrl${ServerRoutes.AUTH_GOOGLE}") {
             contentType(ContentType.Application.Json)
             header("Accept", ContentType.Application.Json.toString())
             setBody(buildJsonObject {

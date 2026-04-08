@@ -1,6 +1,7 @@
 plugins {
     alias(libs.plugins.kotlinJvm)
-    alias(libs.plugins.ktor)
+    alias(libs.plugins.kotlinSpring)
+    alias(libs.plugins.springBoot)
     application
 }
 
@@ -12,25 +13,23 @@ kotlin {
 }
 
 application {
-    mainClass.set("com.molla.mollaai.ApplicationKt")
-
-    val isDevelopment: Boolean = project.ext.has("development")
-    applicationDefaultJvmArgs = listOf("-Dio.ktor.development=$isDevelopment")
+    mainClass.set("com.molla.mollaai.MollaAiApplicationKt")
 }
 
 dependencies {
+    implementation(platform("org.springframework.boot:spring-boot-dependencies:${libs.versions.springBoot.get()}"))
+
     implementation(projects.shared)
-    implementation(libs.logback)
-    implementation(libs.ktor.serverCore)
-    implementation(libs.ktor.serverNetty)
-    implementation(libs.ktor.serverConfigYaml)
+    implementation("org.springframework.boot:spring-boot-starter-web")
+    implementation("com.fasterxml.jackson.module:jackson-module-kotlin")
+    implementation(kotlin("reflect"))
+
     implementation(libs.google.api.client)
     implementation(libs.google.oauth.client)
     implementation(libs.google.http.client.jackson2)
     implementation(libs.mysql.connector.j)
     implementation(libs.hibernate.core)
     implementation(libs.java.jwt)
-    implementation(libs.kotlinx.serialization.json)
-    testImplementation(libs.ktor.serverTestHost)
-    testImplementation(libs.kotlin.testJunit)
+
+    testImplementation("org.springframework.boot:spring-boot-starter-test")
 }
