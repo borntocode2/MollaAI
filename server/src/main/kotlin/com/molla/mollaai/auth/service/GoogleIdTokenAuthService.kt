@@ -49,7 +49,7 @@ class GoogleIdTokenAuthService(
             pictureUrl = pictureUrl,
             now = now,
         )
-        logger.info("User saved: subject={}", user.googleSubject)
+        logger.info("User saved: id={}, subject={}", user.id, user.googleSubject)
 
         val expiresAt = now.plusSeconds(60 * 60 * 24)
         val accessToken = JWT.create()

@@ -13,4 +13,12 @@ interface UserRepository {
     ): AppUserRecord
 
     fun findBySubject(googleSubject: String): AppUserRecord?
+
+    fun updatePhoneNumber(
+        googleSubject: String,
+        phoneNumber: String,
+        now: Instant,
+    ): AppUserRecord
+
+    fun findByPhoneNumber(phoneNumber: String): AppUserRecord?
 }

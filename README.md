@@ -2,6 +2,26 @@ This is a Kotlin Multiplatform project targeting Android, iOS, Web, Desktop (JVM
 
 ## 개발 기록
 
+### 2026-04-08
+
+- Google 로그인 이후에 SMS 핸드폰 인증 흐름을 추가했습니다.
+- 전화번호 인증은 `인증번호 요청`과 `인증번호 확인` 2개의 서버 API로 나뉩니다.
+- 서버는 6자리 인증번호를 생성해서 3분 TTL 임시 저장소에 보관합니다. 현재 구현은 `PhoneVerificationCodeStore`의 in-memory TTL 버전입니다.
+- SMS 발송은 `SolapiSmsSender`를 직접 사용합니다.
+- 인증이 완료되면 `app_users` 테이블의 사용자 레코드에 국제전화 형식 전화번호를 저장합니다. 예: `+821012345678`, `+14155552671`.
+- 사용자 테이블은 내부 식별용 UUID `id`를 별도로 가지도록 바꿨고, `google_subject`는 유니크 키로 유지합니다.
+- Android 화면에 국가 코드, 전화번호, 인증번호 입력 UI를 추가했습니다.
+- Google 로그인 후 서버 응답에 저장된 전화번호가 있으면 앱에 바로 표시합니다.
+- 구현 위치:
+  - 공통 UI: [`composeApp/src/commonMain/kotlin/com/molla/mollaai/App.kt`](/Users/ralph/BackEnd/MollaAI/composeApp/src/commonMain/kotlin/com/molla/mollaai/App.kt)
+  - Android 진입점: [`composeApp/src/androidMain/kotlin/com/molla/mollaai/MainActivity.kt`](/Users/ralph/BackEnd/MollaAI/composeApp/src/androidMain/kotlin/com/molla/mollaai/MainActivity.kt)
+  - Android 전화 인증 클라이언트: [`composeApp/src/androidMain/kotlin/com/molla/mollaai/BackendPhoneAuthClient.kt`](/Users/ralph/BackEnd/MollaAI/composeApp/src/androidMain/kotlin/com/molla/mollaai/BackendPhoneAuthClient.kt)
+  - 서버 전화 인증 컨트롤러: [`server/src/main/kotlin/com/molla/mollaai/controller/PhoneAuthController.kt`](/Users/ralph/BackEnd/MollaAI/server/src/main/kotlin/com/molla/mollaai/controller/PhoneAuthController.kt)
+  - 서버 전화 인증 서비스: [`server/src/main/kotlin/com/molla/mollaai/phone/service/PhoneVerificationService.kt`](/Users/ralph/BackEnd/MollaAI/server/src/main/kotlin/com/molla/mollaai/phone/service/PhoneVerificationService.kt)
+  - 서버 JWT 검증 서비스: [`server/src/main/kotlin/com/molla/mollaai/auth/service/JwtAccessTokenService.kt`](/Users/ralph/BackEnd/MollaAI/server/src/main/kotlin/com/molla/mollaai/auth/service/JwtAccessTokenService.kt)
+  - 서버 사용자 엔티티: [`server/src/main/kotlin/com/molla/mollaai/auth/entity/AppUserEntity.kt`](/Users/ralph/BackEnd/MollaAI/server/src/main/kotlin/com/molla/mollaai/auth/entity/AppUserEntity.kt)
+  - 전화번호 정규화 테스트: [`server/src/test/kotlin/com/molla/mollaai/PhoneVerificationServiceTest.kt`](/Users/ralph/BackEnd/MollaAI/server/src/test/kotlin/com/molla/mollaai/PhoneVerificationServiceTest.kt)
+
 ### 2026-04-06
 
 - Android 시작 화면을 `molla AI` 온보딩 카드 구조로 정리했습니다.

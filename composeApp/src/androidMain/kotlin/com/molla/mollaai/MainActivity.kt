@@ -20,6 +20,7 @@ class MainActivity : ComponentActivity() {
     private val activityScope = CoroutineScope(SupervisorJob() + Dispatchers.Main.immediate)
     private val googleSignInCoordinator by lazy { GoogleSignInCoordinator(this) }
     private val backendAuthClient by lazy { BackendAuthClient(this) }
+    private val backendPhoneAuthClient by lazy { BackendPhoneAuthClient(this) }
     private val authSessionStore by lazy { AuthSessionStore(this) }
 
     private var googleAccountLabel by mutableStateOf<String?>(null)
@@ -28,6 +29,14 @@ class MainActivity : ComponentActivity() {
     private var backendSessionToken by mutableStateOf<String?>(null)
     private var isGoogleSignInInProgress by mutableStateOf(false)
     private var isBackendSyncInProgress by mutableStateOf(false)
+    private var verifiedPhoneNumber by mutableStateOf<String?>(null)
+    private var phoneCountryCode by mutableStateOf("82")
+    private var phoneNumber by mutableStateOf("")
+    private var phoneVerificationCode by mutableStateOf("")
+    private var phoneVerificationMessage by mutableStateOf<String?>(null)
+    private var phoneVerificationErrorMessage by mutableStateOf<String?>(null)
+    private var isPhoneVerificationRequestInProgress by mutableStateOf(false)
+    private var isPhoneVerificationConfirmInProgress by mutableStateOf(false)
 
     override fun onCreate(savedInstanceState: Bundle?) {
         enableEdgeToEdge()
@@ -41,7 +50,20 @@ class MainActivity : ComponentActivity() {
                 googleSignInErrorMessage = googleSignInErrorMessage,
                 backendSyncMessage = backendSyncMessage,
                 isBackendSyncInProgress = isBackendSyncInProgress,
+                verifiedPhoneNumber = verifiedPhoneNumber,
+                phoneCountryCode = phoneCountryCode,
+                phoneNumber = phoneNumber,
+                phoneVerificationCode = phoneVerificationCode,
+                phoneVerificationMessage = phoneVerificationMessage,
+                phoneVerificationErrorMessage = phoneVerificationErrorMessage,
+                isPhoneVerificationRequestInProgress = isPhoneVerificationRequestInProgress,
+                isPhoneVerificationConfirmInProgress = isPhoneVerificationConfirmInProgress,
                 onGoogleSignIn = ::startGoogleSignIn,
+                onPhoneCountryCodeChange = { phoneCountryCode = it },
+                onPhoneNumberChange = { phoneNumber = it },
+                onPhoneVerificationCodeChange = { phoneVerificationCode = it },
+                onRequestPhoneVerification = ::requestPhoneVerification,
+                onConfirmPhoneVerification = ::confirmPhoneVerification,
             )
         }
     }
@@ -49,6 +71,7 @@ class MainActivity : ComponentActivity() {
     override fun onDestroy() {
         backendSessionToken = null
         backendAuthClient.close()
+        backendPhoneAuthClient.close()
         activityScope.cancel()
         super.onDestroy()
     }
@@ -86,12 +109,22 @@ class MainActivity : ComponentActivity() {
                     backendSessionToken = backendSession.accessToken
                     authSessionStore.save(backendSession)
                     backendSyncMessage = "서버 로그인 완료: 앱 세션 토큰을 받았습니다."
+                    verifiedPhoneNumber = backendSession.userPhoneNumber
+                    phoneCountryCode = "82"
+                    phoneNumber = ""
+                    phoneVerificationMessage = null
+                    phoneVerificationErrorMessage = null
+                    phoneVerificationCode = ""
                     googleSignInErrorMessage = null
                 }.onFailure { backendError ->
                     Log.e(TAG, "Backend sync failed", backendError)
                     backendSessionToken = null
                     authSessionStore.clear()
                     backendSyncMessage = null
+                    verifiedPhoneNumber = null
+                    phoneVerificationMessage = null
+                    phoneVerificationErrorMessage = backendError.message ?: "서버 인증에 실패했습니다."
+                    phoneVerificationCode = ""
                     googleSignInErrorMessage = backendError.message ?: "서버 인증에 실패했습니다."
                 }
             }.onFailure { error ->
@@ -101,6 +134,68 @@ class MainActivity : ComponentActivity() {
 
             isBackendSyncInProgress = false
             isGoogleSignInInProgress = false
+        }
+    }
+
+    private fun requestPhoneVerification() {
+        val sessionToken = backendSessionToken ?: run {
+            phoneVerificationErrorMessage = "서버 세션이 없습니다. 다시 로그인하세요."
+            return
+        }
+        if (isPhoneVerificationRequestInProgress) return
+
+        phoneVerificationMessage = null
+        phoneVerificationErrorMessage = null
+        isPhoneVerificationRequestInProgress = true
+
+        activityScope.launch {
+            runCatching {
+                backendPhoneAuthClient.requestVerification(
+                    accessToken = sessionToken,
+                    countryCode = phoneCountryCode,
+                    phoneNumber = phoneNumber,
+                )
+            }.onSuccess { challenge ->
+                phoneVerificationMessage = "인증번호를 전송했습니다. (${challenge.phoneNumber})"
+            }.onFailure { error ->
+                Log.e(TAG, "Phone verification request failed", error)
+                phoneVerificationErrorMessage = error.message ?: "인증번호 요청에 실패했습니다."
+            }
+
+            isPhoneVerificationRequestInProgress = false
+        }
+    }
+
+    private fun confirmPhoneVerification() {
+        val sessionToken = backendSessionToken ?: run {
+            phoneVerificationErrorMessage = "서버 세션이 없습니다. 다시 로그인하세요."
+            return
+        }
+        if (isPhoneVerificationConfirmInProgress) return
+
+        phoneVerificationMessage = null
+        phoneVerificationErrorMessage = null
+        isPhoneVerificationConfirmInProgress = true
+
+        activityScope.launch {
+            runCatching {
+                backendPhoneAuthClient.confirmVerification(
+                    accessToken = sessionToken,
+                    countryCode = phoneCountryCode,
+                    phoneNumber = phoneNumber,
+                    verificationCode = phoneVerificationCode,
+                )
+            }.onSuccess { confirmation ->
+                verifiedPhoneNumber = confirmation.phoneNumber
+                phoneVerificationMessage = "전화번호 인증이 완료되었습니다: ${confirmation.phoneNumber}"
+                phoneVerificationErrorMessage = null
+                phoneVerificationCode = ""
+            }.onFailure { error ->
+                Log.e(TAG, "Phone verification confirm failed", error)
+                phoneVerificationErrorMessage = error.message ?: "인증번호 확인에 실패했습니다."
+            }
+
+            isPhoneVerificationConfirmInProgress = false
         }
     }
 

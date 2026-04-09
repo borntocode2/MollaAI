@@ -25,4 +25,11 @@ class ApiExceptionHandler {
             ApiErrorResponse(message = exception.reason ?: "요청 처리에 실패했습니다."),
         )
     }
+
+    @ExceptionHandler(Exception::class)
+    fun handleUnexpectedException(exception: Exception): ResponseEntity<ApiErrorResponse> {
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(
+            ApiErrorResponse(message = exception.message ?: "알 수 없는 서버 오류가 발생했습니다."),
+        )
+    }
 }

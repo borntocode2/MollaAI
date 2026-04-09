@@ -9,11 +9,13 @@ import io.ktor.client.request.post
 import io.ktor.client.request.setBody
 import io.ktor.http.ContentType
 import io.ktor.http.contentType
+import io.ktor.http.isSuccess
 import io.ktor.client.statement.bodyAsText
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.buildJsonObject
 import kotlinx.serialization.json.jsonObject
 import kotlinx.serialization.json.jsonPrimitive
+import kotlinx.serialization.json.contentOrNull
 import kotlinx.serialization.json.put
 
 /**
@@ -40,6 +42,10 @@ class BackendAuthClient(
         Log.i(TAG, "Backend response received: status=${response.status}")
         Log.d(TAG, "Backend response body: $responseText")
 
+        if (!response.status.isSuccess()) {
+            throw IllegalStateException(extractMessage(responseText) ?: "서버 인증에 실패했습니다. status=${response.status.value}")
+        }
+
         val jsonElement = Json.parseToJsonElement(responseText).jsonObject
         val accessToken = jsonElement["accessToken"]?.jsonPrimitive?.content
             ?: throw IllegalStateException("서버 응답에 accessToken이 없습니다.")
@@ -47,11 +53,17 @@ class BackendAuthClient(
         val expiresAtEpochSeconds = jsonElement["expiresAtEpochSeconds"]?.jsonPrimitive?.content
             ?.toLongOrNull()
             ?: throw IllegalStateException("서버 응답에 expiresAtEpochSeconds가 없습니다.")
+        val userPhoneNumber = jsonElement["user"]
+            ?.jsonObject
+            ?.get("phoneNumber")
+            ?.jsonPrimitive
+            ?.contentOrNull
 
         return BackendSession(
             accessToken = accessToken,
             tokenType = tokenType,
             expiresAtEpochSeconds = expiresAtEpochSeconds,
+            userPhoneNumber = userPhoneNumber,
             rawResponse = responseText,
         )
     }
@@ -64,11 +76,18 @@ class BackendAuthClient(
     private companion object {
         private const val TAG = "BackendAuthClient"
     }
+
+    private fun extractMessage(responseText: String): String? {
+        return runCatching {
+            Json.parseToJsonElement(responseText).jsonObject["message"]?.jsonPrimitive?.contentOrNull
+        }.getOrNull()
+    }
 }
 
 data class BackendSession(
     val accessToken: String,
     val tokenType: String,
     val expiresAtEpochSeconds: Long,
+    val userPhoneNumber: String?,
     val rawResponse: String,
 )

@@ -31,5 +31,8 @@ dependencies {
     implementation(libs.hibernate.core)
     implementation(libs.java.jwt)
 
+    //SMS발송 솔라피 API
+    implementation("com.solapi:sdk:1.1.0")
+
     testImplementation("org.springframework.boot:spring-boot-starter-test")
 }
