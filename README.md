@@ -8,7 +8,7 @@ This is a Kotlin Multiplatform project targeting Android, iOS, Web, Desktop (JVM
 - 전화번호 인증은 `인증번호 요청`과 `인증번호 확인` 2개의 서버 API로 나뉩니다.
 - 서버는 6자리 인증번호를 생성해서 3분 TTL 임시 저장소에 보관합니다. 현재 구현은 `PhoneVerificationCodeStore`의 in-memory TTL 버전입니다.
 - SMS 발송은 `SolapiSmsSender`를 직접 사용합니다.
-- 인증이 완료되면 `app_users` 테이블의 사용자 레코드에 국제전화 형식 전화번호를 저장합니다. 예: `+821012345678`, `+14155552671`.
+- 인증이 완료되면 `app_users` 테이블의 사용자 레코드에 전화번호만 저장합니다. 예: `01057807344`.
 - 사용자 테이블은 내부 식별용 UUID `id`를 별도로 가지도록 바꿨고, `google_subject`는 유니크 키로 유지합니다.
 - Android 화면에 국가 코드, 전화번호, 인증번호 입력 UI를 추가했습니다.
 - Google 로그인 후 서버 응답에 저장된 전화번호가 있으면 앱에 바로 표시합니다.

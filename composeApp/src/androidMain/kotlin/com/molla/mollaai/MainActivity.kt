@@ -30,7 +30,6 @@ class MainActivity : ComponentActivity() {
     private var isGoogleSignInInProgress by mutableStateOf(false)
     private var isBackendSyncInProgress by mutableStateOf(false)
     private var verifiedPhoneNumber by mutableStateOf<String?>(null)
-    private var phoneCountryCode by mutableStateOf("82")
     private var phoneNumber by mutableStateOf("")
     private var phoneVerificationCode by mutableStateOf("")
     private var phoneVerificationMessage by mutableStateOf<String?>(null)
@@ -51,7 +50,6 @@ class MainActivity : ComponentActivity() {
                 backendSyncMessage = backendSyncMessage,
                 isBackendSyncInProgress = isBackendSyncInProgress,
                 verifiedPhoneNumber = verifiedPhoneNumber,
-                phoneCountryCode = phoneCountryCode,
                 phoneNumber = phoneNumber,
                 phoneVerificationCode = phoneVerificationCode,
                 phoneVerificationMessage = phoneVerificationMessage,
@@ -59,7 +57,6 @@ class MainActivity : ComponentActivity() {
                 isPhoneVerificationRequestInProgress = isPhoneVerificationRequestInProgress,
                 isPhoneVerificationConfirmInProgress = isPhoneVerificationConfirmInProgress,
                 onGoogleSignIn = ::startGoogleSignIn,
-                onPhoneCountryCodeChange = { phoneCountryCode = it },
                 onPhoneNumberChange = { phoneNumber = it },
                 onPhoneVerificationCodeChange = { phoneVerificationCode = it },
                 onRequestPhoneVerification = ::requestPhoneVerification,
@@ -110,7 +107,6 @@ class MainActivity : ComponentActivity() {
                     authSessionStore.save(backendSession)
                     backendSyncMessage = "서버 로그인 완료: 앱 세션 토큰을 받았습니다."
                     verifiedPhoneNumber = backendSession.userPhoneNumber
-                    phoneCountryCode = "82"
                     phoneNumber = ""
                     phoneVerificationMessage = null
                     phoneVerificationErrorMessage = null
@@ -152,7 +148,6 @@ class MainActivity : ComponentActivity() {
             runCatching {
                 backendPhoneAuthClient.requestVerification(
                     accessToken = sessionToken,
-                    countryCode = phoneCountryCode,
                     phoneNumber = phoneNumber,
                 )
             }.onSuccess { challenge ->
@@ -181,7 +176,6 @@ class MainActivity : ComponentActivity() {
             runCatching {
                 backendPhoneAuthClient.confirmVerification(
                     accessToken = sessionToken,
-                    countryCode = phoneCountryCode,
                     phoneNumber = phoneNumber,
                     verificationCode = phoneVerificationCode,
                 )

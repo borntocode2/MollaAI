@@ -12,10 +12,10 @@ open class SolapiSmsSender(
     private val logger = LoggerFactory.getLogger(SolapiSmsSender::class.java)
     private val messageService = SolapiClient.createInstance(apiKey, apiSecret)
 
-    open fun sendVerificationCode(countryCode: String, phoneNumber: String, verificationCode: String) {
+    open fun sendVerificationCode(phoneNumber: String, verificationCode: String) {
         val message = Message(
             from = fromNumber,
-            to = formatRecipient(countryCode, phoneNumber),
+            to = formatRecipient(phoneNumber),
             text = "인증번호는 $verificationCode 입니다.",
         )
 
@@ -23,21 +23,13 @@ open class SolapiSmsSender(
         logger.info("Solapi SMS sent: groupId={}", response.groupInfo?.groupId)
     }
 
-    private fun formatRecipient(countryCode: String, phoneNumber: String): String {
-        val countryDigits = countryCode.filter(Char::isDigit)
+    private fun formatRecipient(phoneNumber: String): String {
         val phoneDigits = phoneNumber.filter(Char::isDigit)
 
-        if (countryDigits.isBlank()) {
-            throw IllegalArgumentException("국가번호가 필요합니다.")
-        }
         if (phoneDigits.isBlank()) {
             throw IllegalArgumentException("휴대폰 번호가 필요합니다.")
         }
 
-        return if (countryDigits == "82" && phoneDigits.startsWith("0")) {
-            phoneDigits
-        } else {
-            phoneDigits
-        }
+        return phoneDigits
     }
 }

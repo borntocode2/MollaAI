@@ -33,7 +33,6 @@ fun App(
     backendSyncMessage: String? = null,
     isBackendSyncInProgress: Boolean = false,
     verifiedPhoneNumber: String? = null,
-    phoneCountryCode: String = "82",
     phoneNumber: String = "",
     phoneVerificationCode: String = "",
     phoneVerificationMessage: String? = null,
@@ -41,7 +40,6 @@ fun App(
     isPhoneVerificationRequestInProgress: Boolean = false,
     isPhoneVerificationConfirmInProgress: Boolean = false,
     onGoogleSignIn: () -> Unit = {},
-    onPhoneCountryCodeChange: (String) -> Unit = {},
     onPhoneNumberChange: (String) -> Unit = {},
     onPhoneVerificationCodeChange: (String) -> Unit = {},
     onRequestPhoneVerification: () -> Unit = {},
@@ -140,17 +138,10 @@ fun App(
                         )
 
                         OutlinedTextField(
-                            value = phoneCountryCode,
-                            onValueChange = onPhoneCountryCodeChange,
-                            modifier = Modifier.fillMaxWidth(),
-                            label = { Text("국가 코드") },
-                            singleLine = true,
-                        )
-                        OutlinedTextField(
                             value = phoneNumber,
                             onValueChange = onPhoneNumberChange,
                             modifier = Modifier.fillMaxWidth(),
-                            label = { Text("휴대폰 번호") },
+                            label = { Text("휴대폰 번호 (예: 01057807344)") },
                             singleLine = true,
                         )
                         Button(

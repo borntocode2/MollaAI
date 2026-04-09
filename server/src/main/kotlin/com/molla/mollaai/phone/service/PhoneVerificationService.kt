@@ -22,11 +22,10 @@ class PhoneVerificationService(
 
     fun requestVerification(
         authorizationHeader: String?,
-        countryCode: String,
         phoneNumber: String,
     ): PhoneVerificationChallengeResponse {
         val googleSubject = accessTokenService.requireGoogleSubject(authorizationHeader)
-        val normalizedPhoneNumber = normalizePhoneNumber(countryCode, phoneNumber)
+        val normalizedPhoneNumber = normalizePhoneNumber(phoneNumber)
         val now = Instant.now(clock)
         val code = generateCode()
         val expiresAt = now.plus(Duration.ofMinutes(3))
@@ -39,7 +38,7 @@ class PhoneVerificationService(
         )
 
         codeStore.save(normalizedPhoneNumber, code, expiresAt)
-        smsSender.sendVerificationCode(countryCode, phoneNumber, code)
+        smsSender.sendVerificationCode(normalizedPhoneNumber, code)
 
         return PhoneVerificationChallengeResponse(
             phoneNumber = normalizedPhoneNumber,
@@ -50,12 +49,11 @@ class PhoneVerificationService(
 
     fun confirmVerification(
         authorizationHeader: String?,
-        countryCode: String,
         phoneNumber: String,
         verificationCode: String,
     ): PhoneVerificationConfirmResponse {
         val googleSubject = accessTokenService.requireGoogleSubject(authorizationHeader)
-        val normalizedPhoneNumber = normalizePhoneNumber(countryCode, phoneNumber)
+        val normalizedPhoneNumber = normalizePhoneNumber(phoneNumber)
         val storedCode = codeStore.find(normalizedPhoneNumber)
             ?: throw IllegalArgumentException("인증번호가 만료되었거나 요청되지 않았습니다.")
 
@@ -85,23 +83,13 @@ class PhoneVerificationService(
         }
     }
 
-    private fun normalizePhoneNumber(countryCode: String, phoneNumber: String): String {
-        val countryDigits = countryCode.filter(Char::isDigit)
+    private fun normalizePhoneNumber(phoneNumber: String): String {
         val phoneDigits = phoneNumber.filter(Char::isDigit)
 
-        if (countryDigits.isBlank()) {
-            throw IllegalArgumentException("국가번호가 필요합니다.")
-        }
         if (phoneDigits.isBlank()) {
             throw IllegalArgumentException("휴대폰 번호가 필요합니다.")
         }
 
-        val nationalDigits = if (countryDigits == "82" && phoneDigits.startsWith("0")) {
-            phoneDigits.drop(1)
-        } else {
-            phoneDigits
-        }
-
-        return "+$countryDigits$nationalDigits"
+        return phoneDigits
     }
 }

@@ -24,7 +24,6 @@ class PhoneAuthController(
     ): PhoneVerificationChallengeResponse {
         return phoneVerificationService.requestVerification(
             authorizationHeader = authorization,
-            countryCode = request.countryCode,
             phoneNumber = request.phoneNumber,
         )
     }
@@ -36,7 +35,6 @@ class PhoneAuthController(
     ): PhoneVerificationConfirmResponse {
         return phoneVerificationService.confirmVerification(
             authorizationHeader = authorization,
-            countryCode = request.countryCode,
             phoneNumber = request.phoneNumber,
             verificationCode = request.verificationCode,
         )

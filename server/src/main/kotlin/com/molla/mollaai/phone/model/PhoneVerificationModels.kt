@@ -3,12 +3,10 @@ package com.molla.mollaai.phone.model
 import com.molla.mollaai.auth.model.AppUserRecord
 
 data class PhoneVerificationRequest(
-    val countryCode: String,
     val phoneNumber: String,
 )
 
 data class PhoneVerificationConfirmRequest(
-    val countryCode: String,
     val phoneNumber: String,
     val verificationCode: String,
 )

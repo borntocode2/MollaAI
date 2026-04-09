@@ -25,7 +25,6 @@ class BackendPhoneAuthClient(
 
     suspend fun requestVerification(
         accessToken: String,
-        countryCode: String,
         phoneNumber: String,
     ): BackendPhoneVerificationChallenge {
         val baseUrl = context.getString(R.string.spring_server_base_url).trimEnd('/')
@@ -37,7 +36,6 @@ class BackendPhoneAuthClient(
             header("Authorization", "Bearer $accessToken")
             setBody(
                 buildJsonObject {
-                    put("countryCode", countryCode)
                     put("phoneNumber", phoneNumber)
                 }.toString(),
             )
@@ -70,7 +68,6 @@ class BackendPhoneAuthClient(
 
     suspend fun confirmVerification(
         accessToken: String,
-        countryCode: String,
         phoneNumber: String,
         verificationCode: String,
     ): BackendPhoneVerificationConfirmation {
@@ -83,7 +80,6 @@ class BackendPhoneAuthClient(
             header("Authorization", "Bearer $accessToken")
             setBody(
                 buildJsonObject {
-                    put("countryCode", countryCode)
                     put("phoneNumber", phoneNumber)
                     put("verificationCode", verificationCode)
                 }.toString(),

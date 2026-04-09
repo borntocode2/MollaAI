@@ -18,12 +18,10 @@ class PhoneVerificationServiceTest {
     private val fixedClock = Clock.fixed(Instant.parse("2026-04-08T00:00:00Z"), ZoneOffset.UTC)
 
     private class RecordingSolapiSmsSender : SolapiSmsSender("dummy-key", "dummy-secret", "01000000000") {
-        var lastCountryCode: String? = null
         var lastPhoneNumber: String? = null
         var lastVerificationCode: String? = null
 
-        override fun sendVerificationCode(countryCode: String, phoneNumber: String, verificationCode: String) {
-            lastCountryCode = countryCode
+        override fun sendVerificationCode(phoneNumber: String, verificationCode: String) {
             lastPhoneNumber = phoneNumber
             lastVerificationCode = verificationCode
         }
@@ -108,26 +106,23 @@ class PhoneVerificationServiceTest {
 
         val challenge = service.requestVerification(
             authorizationHeader = "Bearer test-token",
-            countryCode = "82",
             phoneNumber = "010-1234-5678",
         )
-        assertEquals("+821012345678", challenge.phoneNumber)
+        assertEquals("01012345678", challenge.phoneNumber)
 
-        val verificationCode = codeStore.find("+821012345678")
+        val verificationCode = codeStore.find("01012345678")
         assertNotNull(verificationCode)
-        assertEquals("82", smsSender.lastCountryCode)
-        assertEquals("+821012345678", smsSender.lastPhoneNumber)
+        assertEquals("01012345678", smsSender.lastPhoneNumber)
         assertEquals(verificationCode, smsSender.lastVerificationCode)
 
         val confirmation = service.confirmVerification(
             authorizationHeader = "Bearer test-token",
-            countryCode = "82",
             phoneNumber = "010-1234-5678",
             verificationCode = verificationCode!!,
         )
 
-        assertEquals("+821012345678", confirmation.phoneNumber)
-        assertEquals("+821012345678", confirmation.user.phoneNumber)
+        assertEquals("01012345678", confirmation.phoneNumber)
+        assertEquals("01012345678", confirmation.user.phoneNumber)
     }
 
     @Test
@@ -152,25 +147,22 @@ class PhoneVerificationServiceTest {
 
         val challenge = service.requestVerification(
             authorizationHeader = "Bearer test-token",
-            countryCode = "1",
             phoneNumber = "415-555-2671",
         )
-        assertEquals("+14155552671", challenge.phoneNumber)
+        assertEquals("4155552671", challenge.phoneNumber)
 
-        val verificationCode = codeStore.find("+14155552671")
+        val verificationCode = codeStore.find("4155552671")
         assertNotNull(verificationCode)
-        assertEquals("1", smsSender.lastCountryCode)
-        assertEquals("+14155552671", smsSender.lastPhoneNumber)
+        assertEquals("4155552671", smsSender.lastPhoneNumber)
         assertEquals(verificationCode, smsSender.lastVerificationCode)
 
         val confirmation = service.confirmVerification(
             authorizationHeader = "Bearer test-token",
-            countryCode = "1",
             phoneNumber = "415-555-2671",
             verificationCode = verificationCode!!,
         )
 
-        assertEquals("+14155552671", confirmation.phoneNumber)
-        assertEquals("+14155552671", confirmation.user.phoneNumber)
+        assertEquals("4155552671", confirmation.phoneNumber)
+        assertEquals("4155552671", confirmation.user.phoneNumber)
     }
 }
